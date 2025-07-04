@@ -30,7 +30,7 @@ function App() {
 
   return (
     <>
-      <div className="bg-green-100 min-h-screen flex flex-col items-center justify-center text-white">
+      <div className=" min-h-screen flex flex-col items-center justify-center text-white">
         <h1 className="md:text-9xl text-6xl flex md:flex-col flex-col lg:flex-row  justify-center items-center font-extrabold text-zinc-900">
           <div>React</div>
           <div className=" flex items-center justify-center">
