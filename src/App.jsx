@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import reactLogo from "./assets/react.svg";
 import "./App.css";
 import { useToast } from "react-toast-drei";
@@ -6,6 +6,49 @@ import { motion } from "framer-motion";
 
 function App() {
   const toast = useToast();
+  const [downloads, setDownloads] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [displayCount, setDisplayCount] = useState(0);
+
+  useEffect(() => {
+    if (downloads && typeof downloads === "number") {
+      let start = 0;
+      const end = downloads;
+      const duration = 2000;
+      const increment = end / (duration / 16);
+
+      const timer = setInterval(() => {
+        start += increment;
+        if (start >= end) {
+          setDisplayCount(end);
+          clearInterval(timer);
+        } else {
+          setDisplayCount(Math.floor(start));
+        }
+      }, 16);
+
+      return () => clearInterval(timer);
+    }
+  }, [downloads]);
+
+  useEffect(() => {
+    const fetchDownloads = async () => {
+      try {
+        const response = await fetch(
+          "https://api.npmjs.org/downloads/point/last-month/react-toast-drei"
+        );
+        const data = await response.json();
+        setDownloads(data.downloads);
+      } catch (error) {
+        console.error("Failed to fetch downloads:", error);
+        setDownloads("N/A");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDownloads();
+  }, []);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText("npm install react-toast-drei");
@@ -49,19 +92,64 @@ function App() {
               alt="React logo"
             />
             ast
-            <div className="relative">Drei.
-              <span className="font-normal absolute text-xs right-0  md:bottom-0 -bottom-2  ">Made By <a href="https://andreidev.tech" target="_blank" rel="noopener noreferrer" className="text-blue-600 font-mono hover:text-blue-800 underline">Andrei</a>❤️</span>
+            <div className="relative">
+              Drei.
+              <span className="font-normal absolute text-xs right-0  md:bottom-0 -bottom-2  ">
+                Made By{" "}
+                <a
+                  href="https://andreidev.tech"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 font-mono hover:text-blue-800 underline"
+                >
+                  Andrei
+                </a>
+                ❤️
+              </span>
             </div>
           </div>
         </h1>
+        <div className=" backdrop-blur-sm rounded-lg p-4 mt-4 max-w-md mx-4">
+          <div className="flex flex-col items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="text-zinc-700 font-medium">Downloads</span>
+            </div>
+            <div className="">
+              <div className="flex items-center justify-center ">
+                {loading ? (
+                  <div className="animate-pulse bg-zinc-300 h-6 w-16 rounded"></div>
+                ) : (
+                  <span className="text-2xl font-bold text-blue-600">
+                    {typeof downloads === "number"
+                      ? displayCount.toLocaleString()
+                      : downloads}
+                  </span>
+                )}
+                <svg
+                  className="w-5 h-5 text-gray-300"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  ></path>
+                </svg>
+              </div>
+
+              <div className="text-xs tracking-widest text-zinc-500"> last month</div>
+            </div>
+          </div>
+        </div>
 
         <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 mt-6 max-w-md mx-4">
-          <h2 className="text-xl font-semibold text-zinc-800 mb-3">
-            Quick Install
+          <h2 className="text-lg font-semibold text-zinc-800 mb-3">
+            How to Install
           </h2>
           <div className="space-y-2">
             <div className="bg-zinc-900 text-green-400 p-3 rounded font-mono text-sm flex justify-between items-center">
-              <span>npm install react-toast-drei</span>
+              <span>> npm install react-toast-drei</span>
               <button
                 onClick={copyToClipboard}
                 className="text-zinc-400 hover:text-white transition-colors duration-200 ml-3"
@@ -93,7 +181,8 @@ function App() {
                 rel="noopener noreferrer"
               >
                 Documentation
-              </a>.
+              </a>
+              .
             </p>
           </div>
         </div>
